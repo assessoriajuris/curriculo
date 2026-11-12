@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currículo Profissional IA - Gerador Inteligente em PDF</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter e Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js para exportação direta em PDF A4 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos específicos para a Folha A4 e Impressão */
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Escala responsiva da pré-visualização A4 em telas menores */
+        .preview-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        @media (max-width: 850px) {
+            .a4-scale-box {
+                transform-origin: top left;
+            }
+        }
+
+        /* Regras de impressão nativa como fallback e suporte perfeito */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #resume-document, #resume-document * {
+                visibility: visible;
+            }
+            #resume-document {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 210mm !important;
+                min-height: 297mm !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                transform: none !important;
+            }
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+
+        /* Scrollbar suave */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Animação do botão IA */
+        .ai-gradient {
+            background: linear-gradient(135deg, #0f294a 0%, #1d4ed8 50%, #0284c7 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased">
+
+    <!-- Notificação Toast Customizada (Substitui alert) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none max-w-sm">
+        <div id="toast-content" class="bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+            <span id="toast-message" class="text-sm font-medium">Mensagem aqui</span>
+        </div>
+    </div>
+
+    <!-- Cabeçalho Superior -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-900 text-white flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-file-signature text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-extrabold text-lg sm:text-xl text-slate-900 leading-none">
+                        Currículo Profissional <span class="text-blue-600">IA</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-500 font-medium mt-0.5">Preencha simples • IA profissionaliza • Baixe em PDF</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button type="button" onclick="fillExampleData()" class="text-xs sm:text-sm font-semibold text-slate-600 hover:text-blue-700 bg-slate-100 hover:bg-blue-50 px-3 py-2 rounded-lg transition flex items-center gap-1.5" title="Preencher com exemplo para testar">
+                    <i class="fa-solid fa-wand-magic"></i>
+                    <span class="hidden sm:inline">Preencher Exemplo</span>
+                </button>
+                <button type="button" onclick="downloadPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Baixar PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação por Abas no Mobile -->
+    <div class="lg:hidden bg-white border-b border-slate-200 px-4 py-2 sticky top-16 z-30 flex gap-2">
+        <button id="tab-edit-btn" onclick="switchMobileTab('edit')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-sm bg-blue-900 text-white shadow-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-pen-to-square"></i> 1. Preencher Dados
+        </button>
+        <button id="tab-preview-btn" onclick="switchMobileTab('preview')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-sm bg-slate-100 text-slate-600 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-eye"></i> 2. Ver Currículo PDF
+        </button>
+    </div>
+
+    <!-- Conteúdo Principal Split-Screen -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- COLUNA ESQUERDA: Formulário Intuitivo (5 Colunas) -->
+            <div id="editor-panel" class="lg:col-span-5 space-y-6">
+
+                <!-- Passo 1: Estilo Visual e Foto -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-heading font-bold text-base text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-extrabold">1</span>
+                            Estilo e Foto de Perfil
+                        </h2>
+                        <span class="text-[11px] font-medium text-slate-400">Opcional</span>
+                    </div>
+
+                    <!-- Seletor de Cores do Template -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Cor do Currículo</label>
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <button type="button" onclick="setTheme('navy')" id="theme-navy" class="theme-btn ring-2 ring-blue-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex flex-col items-center gap-1.5 transition">
+                                <span class="w-6 h-6 rounded-full bg-[#0f294a] shadow-inner"></span>
+                                <span class="text-xs font-bold text-slate-700">Azul Marinho</span>
+                            </button>
+                            <button type="button" onclick="setTheme('emerald')" id="theme-emerald" class="theme-btn bg-white hover:bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex flex-col items-center gap-1.5 transition">
+                                <span class="w-6 h-6 rounded-full bg-[#064e3b] shadow-inner"></span>
+                                <span class="text-xs font-semibold text-slate-600">Verde Executivo</span>
+                            </button>
+                            <button type="button" onclick="setTheme('slate')" id="theme-slate" class="theme-btn bg-white hover:bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex flex-col items-center gap-1.5 transition">
+                                <span class="w-6 h-6 rounded-full bg-[#1e293b] shadow-inner"></span>
+                                <span class="text-xs font-semibold text-slate-600">Cinza Grafite</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Upload de Foto -->
+                    <div class="flex items-center gap-4 pt-3 border-t border-slate-100">
+                        <div class="relative w-16 h-16 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden shrink-0">
+                            <img id="form-photo-preview" src="" alt="Foto" class="w-full h-full object-cover hidden">
+                            <i id="form-photo-icon" class="fa-solid fa-camera text-slate-400 text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <label for="photo-upload" class="cursor-pointer inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3.5 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-upload"></i> Escolher Foto
+                            </label>
+                            <input type="file" id="photo-upload" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                            <button type="button" id="remove-photo-btn" onclick="removePhoto()" class="hidden ml-2 text-xs text-red-500 hover:text-red-700 font-medium">
+                                Remover
+                            </button>
+                            <p class="text-[11px] text-slate-400 mt-1">Use uma foto clara e profissional (rosto centralizado).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passo 2: Dados Pessoais -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                    <h2 class="font-heading font-bold text-base text-slate-900 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-extrabold">2</span>
+                        Seus Dados Pessoais
+                    </h2>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nome Completo *</label>
+                        <input type="text" id="input-name" oninput="syncPreview()" placeholder="Ex: João Pedro Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Cargo ou Área Desejada *</label>
+                        <input type="text" id="input-role" oninput="syncPreview()" placeholder="Ex: Auxiliar Administrativo / Vendedor / Atendimento" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Telefone / WhatsApp *</label>
+                            <input type="tel" id="input-phone" oninput="syncPreview()" placeholder="(11) 99999-9999" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Cidade / Estado *</label>
+                            <input type="text" id="input-location" oninput="syncPreview()" placeholder="São Paulo / SP" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">E-mail *</label>
+                            <input type="email" id="input-email" oninput="syncPreview()" placeholder="seuemail@exemplo.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">LinkedIn ou Portfólio (Opcional)</label>
+                            <input type="text" id="input-linkedin" oninput="syncPreview()" placeholder="linkedin.com/in/seuperfil" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passo 3: Resumo / Objetivo -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-heading font-bold text-base text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-extrabold">3</span>
+                            Resumo Profissional
+                        </h2>
+                        <span class="text-[11px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-md">IA melhora para você</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Escreva com suas palavras suas qualidades ou deixe em branco que a IA cria um resumo perfeito para o cargo desejado.</p>
+                    <textarea id="input-summary" rows="3" oninput="syncPreview()" placeholder="Ex: Sou pontual, aprendo rápido, tenho boa comunicação e busco oportunidade para ajudar a empresa a crescer..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"></textarea>
+                </div>
+
+                <!-- Passo 4: Experiências Profissionais -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-heading font-bold text-base text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-extrabold">4</span>
+                            Experiências Profissionais
+                        </h2>
+                        <button type="button" onclick="addExperience()" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Adicionar
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500">Não tem experiência formal? Coloque trabalhos informais, estágios, freelas ou deixe vazio (a IA adapta para primeiro emprego).</p>
+
+                    <div id="experiences-list" class="space-y-4">
+                        <!-- Itens de experiência inseridos via JS -->
+                    </div>
+                </div>
+
+                <!-- Passo 5: Formação Acadêmica -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-heading font-bold text-base text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-extrabold">5</span>
+                            Formação Acadêmica
+                        </h2>
+                        <button type="button" onclick="addEducation()" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Adicionar
+                        </button>
+                    </div>
+
+                    <div id="education-list" class="space-y-3">
+                        <!-- Itens de formação inseridos via JS -->
+                    </div>
+                </div>
+
+                <!-- Passo 6: Habilidades e Cursos -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                    <h2 class="font-heading font-bold text-base text-slate-900 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs flex items-center justify-center font-extrabold">6</span>
+                        Habilidades e Cursos Extras
+                    </h2>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Principais Habilidades (separe por vírgula)</label>
+                        <input type="text" id="input-skills" oninput="syncPreview()" placeholder="Ex: Comunicação, Trabalho em Equipe, Pacote Office, Organização, Proatividade" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Cursos e Certificações (Opcional)</label>
+                        <textarea id="input-courses" rows="2" oninput="syncPreview()" placeholder="Ex: Informática Básica - Senai (2024)&#10;Atendimento ao Cliente - Sebrae (2025)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"></textarea>
+                    </div>
+                </div>
+
+                <!-- BOTÃO PRINCIPAL DE INTELIGÊNCIA ARTIFICIAL -->
+                <div class="sticky bottom-4 z-20 pt-2">
+                    <button type="button" id="ai-generate-btn" onclick="generateWithGemini()" class="ai-gradient w-full py-4 px-6 rounded-2xl text-white font-heading font-extrabold text-base sm:text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 border border-blue-400/30">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300 text-xl"></i>
+                        <span>Gerar Currículo Profissional com IA</span>
+                    </button>
+                    <p class="text-center text-[11px] text-slate-500 mt-2 font-medium">
+                        A IA corrige erros de português e reescreve seus textos para impressionar recrutadores.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- COLUNA DIREITA: Pré-visualização Folha A4 (7 Colunas) -->
+            <div id="preview-panel" class="hidden lg:block lg:col-span-7 sticky top-24">
+                
+                <!-- Barra de Ações da Pré-visualização -->
+                <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Folha A4 Pronta
+                        </span>
+                        <span class="text-xs text-slate-500 hidden sm:inline">Clique em qualquer texto do currículo para editar direto!</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="window.print()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2.5 rounded-xl transition flex items-center gap-1.5" title="Imprimir">
+                            <i class="fa-solid fa-print"></i>
+                            <span class="hidden sm:inline">Imprimir</span>
+                        </button>
+                        <button type="button" id="download-pdf-btn" onclick="downloadPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Baixar Currículo em PDF Pronto</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Overlay de Carregamento da IA -->
+                <div id="ai-loading-overlay" class="hidden bg-white/90 backdrop-blur-md rounded-2xl p-10 border border-blue-200 shadow-xl text-center my-6">
+                    <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mx-auto mb-4"></div>
+                    <h3 class="font-heading font-bold text-lg text-slate-900">A IA está escrevendo seu currículo...</h3>
+                    <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">Corrigindo ortografia, estruturando suas experiências e destacando seus pontos fortes para os recrutadores.</p>
+                </div>
+
+                <!-- Container de Visualização da Folha A4 -->
+                <div id="preview-wrapper" class="preview-wrapper flex justify-center">
+                    <div id="a4-scale-box" class="a4-scale-box">
+                        
+                        <!-- DOCUMENTO A4 REAL (Inspirado no modelo de 2 colunas Azul Marinho e Branco) -->
+                        <div id="resume-document" class="a4-container flex flex-row text-slate-800">
+                            
+                            <!-- BARRA LATERAL ESQUERDA (34% da largura) -->
+                            <aside id="resume-sidebar" class="w-[34%] bg-[#0f294a] text-white p-7 flex flex-col justify-between transition-colors duration-300">
+                                <div>
+                                    <!-- Foto de Perfil Redonda -->
+                                    <div id="resume-photo-container" class="mb-6 flex justify-center">
+                                        <div class="w-32 h-32 rounded-full border-4 border-white/90 shadow-lg overflow-hidden bg-white/10 flex items-center justify-center">
+                                            <img id="resume-photo" src="" alt="Foto de Perfil" class="w-full h-full object-cover hidden">
+                                            <div id="resume-initials" class="text-3xl font-heading font-extrabold text-white/90 tracking-wider">JP</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Resumo Profissional -->
+                                    <div class="mb-7">
+                                        <h3 class="font-heading font-bold text-xs uppercase tracking-[0.15em] text-white border-b border-white/25 pb-2 mb-3">
+                                            Resumo Profissional
+                                        </h3>
+                                        <p id="resume-summary" contenteditable="true" class="text-[12.5px] leading-[1.6] text-slate-100/95 font-normal outline-none focus:bg-white/10 rounded p-1 -m-1">
+                                            Profissional dedicado, organizado e focado em resultados, com facilidade de aprendizado e excelente relacionamento interpessoal. Busco contribuir ativamente para o crescimento da empresa e alcançar metas com excelência.
+                                        </p>
+                                    </div>
+
+                                    <!-- Habilidades -->
+                                    <div class="mb-6">
+                                        <h3 class="font-heading font-bold text-xs uppercase tracking-[0.15em] text-white border-b border-white/25 pb-2 mb-3">
+                                            Habilidades
+                                        </h3>
+                                        <ul id="resume-skills" contenteditable="true" class="space-y-2 text-[12.5px] text-slate-100/95 outline-none focus:bg-white/10 rounded p-1 -m-1">
+                                            <li class="flex items-start gap-2"><span class="text-sky-300 mt-0.5">•</span><span>Comunicação Assertiva</span></li>
+                                            <li class="flex items-start gap-2"><span class="text-sky-300 mt-0.5">•</span><span>Trabalho em Equipe</span></li>
+                                            <li class="flex items-start gap-2"><span class="text-sky-300 mt-0.5">•</span><span>Organização e Pontualidade</span></li>
+                                            <li class="flex items-start gap-2"><span class="text-sky-300 mt-0.5">•</span><span>Foco em Resultados</span></li>
+                                            <li class="flex items-start gap-2"><span class="text-sky-300 mt-0.5">•</span><span>Proatividade</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Rodapé discreto da barra lateral -->
+                                <div class="pt-4 border-t border-white/15 text-[10px] text-white/60 text-center">
+                                    Currículo atualizado em 2026
+                                </div>
+                            </aside>
+
+                            <!-- COLUNA PRINCIPAL DIREITA (66% da largura) -->
+                            <div class="w-[66%] bg-white p-8 flex flex-col justify-between">
+                                <div>
+                                    <!-- Cabeçalho: Nome, Cargo e Contatos -->
+                                    <header class="border-b-2 border-slate-200 pb-5 mb-6">
+                                        <h1 id="resume-name" contenteditable="true" class="font-heading font-extrabold text-[26px] uppercase tracking-tight text-[#0f294a] leading-tight outline-none focus:bg-slate-50 rounded">
+                                            NOME SOBRENOME
+                                        </h1>
+                                        <p id="resume-role" contenteditable="true" class="font-heading font-bold text-xs uppercase tracking-[0.12em] text-blue-700 mt-1 outline-none focus:bg-slate-50 rounded">
+                                            CARGO OU ÁREA DE ATUAÇÃO
+                                        </p>
+
+                                        <!-- Grid de Contatos com Ícones -->
+                                        <div class="grid grid-cols-2 gap-y-2 gap-x-4 mt-4 text-[12px] text-slate-600">
+                                            <div class="flex items-center gap-2">
+                                                <span id="icon-bg-1" class="w-5 h-5 rounded-full bg-[#0f294a] text-white flex items-center justify-center text-[10px] shrink-0">
+                                                    <i class="fa-solid fa-phone"></i>
+                                                </span>
+                                                <span id="resume-phone" contenteditable="true" class="outline-none focus:bg-slate-50 rounded truncate">(00) 00000-0000</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span id="icon-bg-2" class="w-5 h-5 rounded-full bg-[#0f294a] text-white flex items-center justify-center text-[10px] shrink-0">
+                                                    <i class="fa-solid fa-envelope"></i>
+                                                </span>
+                                                <span id="resume-email" contenteditable="true" class="outline-none focus:bg-slate-50 rounded truncate">email@exemplo.com.br</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span id="icon-bg-3" class="w-5 h-5 rounded-full bg-[#0f294a] text-white flex items-center justify-center text-[10px] shrink-0">
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                </span>
+                                                <span id="resume-location" contenteditable="true" class="outline-none focus:bg-slate-50 rounded truncate">Cidade / UF</span>
+                                            </div>
+                                            <div id="resume-linkedin-row" class="flex items-center gap-2">
+                                                <span id="icon-bg-4" class="w-5 h-5 rounded-full bg-[#0f294a] text-white flex items-center justify-center text-[10px] shrink-0">
+                                                    <i class="fa-brands fa-linkedin-in"></i>
+                                                </span>
+                                                <span id="resume-linkedin" contenteditable="true" class="outline-none focus:bg-slate-50 rounded truncate">linkedin.com/in/exemplo</span>
+                                            </div>
+                                        </div>
+                                    </header>
+
+                                    <!-- Seção: Experiência Profissional -->
+                                    <section class="mb-6">
+                                        <h2 id="heading-exp" class="font-heading font-extrabold text-[13px] uppercase tracking-[0.12em] text-[#0f294a] border-b border-slate-300 pb-1.5 mb-3.5">
+                                            Experiência Profissional
+                                        </h2>
+                                        <div id="resume-experiences" contenteditable="true" class="space-y-4 outline-none focus:bg-slate-50/70 rounded p-1 -m-1">
+                                            <div>
+                                                <div class="flex justify-between items-baseline">
+                                                    <h3 class="font-bold text-[13px] text-slate-900 uppercase">NOME DA EMPRESA | CARGO</h3>
+                                                    <span class="text-[11px] font-semibold text-slate-500">00/0000 - Atual</span>
+                                                </div>
+                                                <ul class="mt-1.5 space-y-1 text-[12px] text-slate-700 leading-relaxed list-disc pl-4">
+                                                    <li>Principais resultados desenvolvidos na função, buscando qualidade e melhoria contínua.</li>
+                                                    <li>Contribuições que geraram impacto positivo para a equipe e para os objetivos do negócio.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <!-- Seção: Formação Acadêmica -->
+                                    <section class="mb-6">
+                                        <h2 id="heading-edu" class="font-heading font-extrabold text-[13px] uppercase tracking-[0.12em] text-[#0f294a] border-b border-slate-300 pb-1.5 mb-3.5">
+                                            Formação Acadêmica
+                                        </h2>
+                                        <div id="resume-education" contenteditable="true" class="space-y-3 outline-none focus:bg-slate-50/70 rounded p-1 -m-1">
+                                            <div>
+                                                <h3 class="font-bold text-[13px] text-slate-900 uppercase">NOME DO CURSO OU ENSINO MÉDIO</h3>
+                                                <p class="text-[12px] text-slate-600">Instituição de Ensino | Cidade/UF</p>
+                                                <p class="text-[11.5px] text-slate-500">Conclusão: 2025</p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <!-- Seção: Cursos e Certificações -->
+                                    <section id="resume-courses-section">
+                                        <h2 id="heading-courses" class="font-heading font-extrabold text-[13px] uppercase tracking-[0.12em] text-[#0f294a] border-b border-slate-300 pb-1.5 mb-3">
+                                            Cursos e Certificações
+                                        </h2>
+                                        <div id="resume-courses" contenteditable="true" class="space-y-1.5 text-[12px] text-slate-700 outline-none focus:bg-slate-50/70 rounded p-1 -m-1">
+                                            <p>• Informática Básica e Pacote Office Completo</p>
+                                            <p>• Atendimento ao Cliente e Comunicação Profissional</p>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- FIM DO DOCUMENTO A4 -->
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Estado da Aplicação
+        let state = {
+            theme: 'navy',
+            photoDataUrl: '',
+            experiences: [
+                { id: 1, company: '', role: '', period: '', description: '' }
+            ],
+            education: [
+                { id: 1, course: '', institution: '', year: '' }
+            ]
+        };
+
+        // Paletas de cores disponíveis
+        const themes = {
+            navy: {
+                primary: '#0f294a',
+                accentText: '#1d4ed8',
+                bulletColor: '#7dd3fc'
+            },
+            emerald: {
+                primary: '#064e3b',
+                accentText: '#047857',
+                bulletColor: '#6ee7b7'
+            },
+            slate: {
+                primary: '#1e293b',
+                accentText: '#334155',
+                bulletColor: '#cbd5e1'
+            }
+        };
+
+        // Inicialização ao carregar a página
+        window.onload = function() {
+            renderExperienceInputs();
+            renderEducationInputs();
+            adjustPreviewScale();
+            window.addEventListener('resize', adjustPreviewScale);
+        };
+
+        // Sistema de Notificação Toast (Sem usar alert())
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+            if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-red-400 text-lg';
+            } else if (type === 'loading') {
+                toastIcon.className = 'fa-solid fa-spinner fa-spin text-sky-400 text-lg';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 4000);
+        }
+
+        // Alternar Abas no Mobile
+        function switchMobileTab(tab) {
+            const editorPanel = document.getElementById('editor-panel');
+            const previewPanel = document.getElementById('preview-panel');
+            const editBtn = document.getElementById('tab-edit-btn');
+            const previewBtn = document.getElementById('tab-preview-btn');
+
+            if (tab === 'edit') {
+                editorPanel.classList.remove('hidden');
+                previewPanel.classList.add('hidden');
+                editBtn.className = 'flex-1 py-2.5 px-3 rounded-xl font-bold text-sm bg-blue-900 text-white shadow-sm transition flex items-center justify-center gap-2';
+                previewBtn.className = 'flex-1 py-2.5 px-3 rounded-xl font-bold text-sm bg-slate-100 text-slate-600 transition flex items-center justify-center gap-2';
+            } else {
+                editorPanel.classList.add('hidden');
+                previewPanel.classList.remove('hidden');
+                previewBtn.className = 'flex-1 py-2.5 px-3 rounded-xl font-bold text-sm bg-blue-900 text-white shadow-sm transition flex items-center justify-center gap-2';
+                editBtn.className = 'flex-1 py-2.5 px-3 rounded-xl font-bold text-sm bg-slate-100 text-slate-600 transition flex items-center justify-center gap-2';
+                setTimeout(adjustPreviewScale, 50);
+            }
+        }
+
+        // Ajustar escala da folha A4 em telas pequenas para caber perfeitamente
+        function adjustPreviewScale() {
+            const wrapper = document.getElementById('preview-wrapper');
+            const scaleBox = document.getElementById('a4-scale-box');
+            if (!wrapper || !scaleBox) return;
+
+            const a4WidthPx = 794; // ~210mm em 96dpi
+            const availableWidth = wrapper.clientWidth - 16;
+
+            if (availableWidth > 0 && availableWidth < a4WidthPx) {
+                const scale = availableWidth / a4WidthPx;
+                scaleBox.style.transform = `scale(${scale})`;
+                scaleBox.style.width = `${a4WidthPx}px`;
+                wrapper.style.height = `${1123 * scale + 20}px`;
+            } else {
+                scaleBox.style.transform = 'none';
+                scaleBox.style.width = 'auto';
+                wrapper.style.height = 'auto';
+            }
+        }
+
+        // Mudar Tema de Cor do Currículo
+        function setTheme(themeKey) {
+            state.theme = themeKey;
+            const t = themes[themeKey];
+
+            // Atualiza botões
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-blue-600', 'bg-slate-50');
+                btn.classList.add('bg-white');
+            });
+            const activeBtn = document.getElementById(`theme-${themeKey}`);
+            if (activeBtn) {
+                activeBtn.classList.add('ring-2', 'ring-blue-600', 'bg-slate-50');
+                activeBtn.classList.remove('bg-white');
+            }
+
+            // Aplica cores no documento A4
+            document.getElementById('resume-sidebar').style.backgroundColor = t.primary;
+            document.getElementById('resume-name').style.color = t.primary;
+            document.getElementById('resume-role').style.color = t.accentText;
+            document.getElementById('heading-exp').style.color = t.primary;
+            document.getElementById('heading-edu').style.color = t.primary;
+            document.getElementById('heading-courses').style.color = t.primary;
+
+            ['icon-bg-1', 'icon-bg-2', 'icon-bg-3', 'icon-bg-4'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.backgroundColor = t.primary;
+            });
+
+            syncPreview();
+        }
+
+        // Upload de Foto de Perfil
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                state.photoDataUrl = e.target.result;
+
+                // Preview no formulário
+                const formImg = document.getElementById('form-photo-preview');
+                const formIcon = document.getElementById('form-photo-icon');
+                const removeBtn = document.getElementById('remove-photo-btn');
+                formImg.src = state.photoDataUrl;
+                formImg.classList.remove('hidden');
+                formIcon.classList.add('hidden');
+                removeBtn.classList.remove('hidden');
+
+                // Preview no currículo
+                const resImg = document.getElementById('resume-photo');
+                const resInitials = document.getElementById('resume-initials');
+                resImg.src = state.photoDataUrl;
+                resImg.classList.remove('hidden');
+                resInitials.classList.add('hidden');
+
+                showToast('Foto adicionada ao currículo!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto() {
+            state.photoDataUrl = '';
+            document.getElementById('photo-upload').value = '';
+            document.getElementById('form-photo-preview').classList.add('hidden');
+            document.getElementById('form-photo-icon').classList.remove('hidden');
+            document.getElementById('remove-photo-btn').classList.add('hidden');
+
+            document.getElementById('resume-photo').classList.add('hidden');
+            document.getElementById('resume-initials').classList.remove('hidden');
+        }
+
+        // Gerenciar Lista de Experiências
+        function renderExperienceInputs() {
+            const container = document.getElementById('experiences-list');
+            container.innerHTML = '';
+
+            state.experiences.forEach((exp, index) => {
+                const div = document.createElement('div');
+                div.className = 'p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-3 relative';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Experiência ${index + 1}</span>
+                        ${state.experiences.length > 1 ? `
+                            <button type="button" onclick="removeExperience(${exp.id})" class="text-xs text-red-500 hover:text-red-700 font-semibold">
+                                <i class="fa-solid fa-trash-can"></i> Remover
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <input type="text" placeholder="Nome da Empresa" value="${escapeHtml(exp.company)}" oninput="updateExperience(${exp.id}, 'company', this.value)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                        <input type="text" placeholder="Seu Cargo" value="${escapeHtml(exp.role)}" oninput="updateExperience(${exp.id}, 'role', this.value)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                    </div>
+                    <input type="text" placeholder="Período (Ex: Jan/2023 - Atual)" value="${escapeHtml(exp.period)}" oninput="updateExperience(${exp.id}, 'period', this.value)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                    <textarea rows="2" placeholder="O que você fazia lá? (Escreva simples, a IA melhora o texto)" oninput="updateExperience(${exp.id}, 'description', this.value)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">${escapeHtml(exp.description)}</textarea>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addExperience() {
+            state.experiences.push({ id: Date.now(), company: '', role: '', period: '', description: '' });
+            renderExperienceInputs();
+        }
+
+        function removeExperience(id) {
+            state.experiences = state.experiences.filter(e => e.id !== id);
+            renderExperienceInputs();
+            syncPreview();
+        }
+
+        function updateExperience(id, field, value) {
+            const item = state.experiences.find(e => e.id === id);
+            if (item) {
+                item[field] = value;
+                syncPreview();
+            }
+        }
+
+        // Gerenciar Lista de Formação Acadêmica
+        function renderEducationInputs() {
+            const container = document.getElementById('education-list');
+            container.innerHTML = '';
+
+            state.education.forEach((edu, index) => {
+                const div = document.createElement('div');
+                div.className = 'p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2.5';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Formação ${index + 1}</span>
+                        ${state.education.length > 1 ? `
+                            <button type="button" onclick="removeEducation(${edu.id})" class="text-xs text-red-500 hover:text-red-700 font-semibold">
+                                <i class="fa-solid fa-trash-can"></i> Remover
+                            </button>
+                        ` : ''}
+                    </div>
+                    <input type="text" placeholder="Curso (Ex: Ensino Médio Completo / Administração)" value="${escapeHtml(edu.course)}" oninput="updateEducation(${edu.id}, 'course', this.value)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <input type="text" placeholder="Instituição / Escola" value="${escapeHtml(edu.institution)}" oninput="updateEducation(${edu.id}, 'institution', this.value)" class="sm:col-span-2 w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                        <input type="text" placeholder="Ano Conclusão" value="${escapeHtml(edu.year)}" oninput="updateEducation(${edu.id}, 'year', this.value)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addEducation() {
+            state.education.push({ id: Date.now(), course: '', institution: '', year: '' });
+            renderEducationInputs();
+        }
+
+        function removeEducation(id) {
+            state.education = state.education.filter(e => e.id !== id);
+            renderEducationInputs();
+            syncPreview();
+        }
+
+        function updateEducation(id, field, value) {
+            const item = state.education.find(e => e.id === id);
+            if (item) {
+                item[field] = value;
+                syncPreview();
+            }
+        }
+
+        // Sincronizar Formulário com Pré-visualização em Tempo Real
+        function syncPreview() {
+            const name = document.getElementById('input-name').value.trim();
+            const role = document.getElementById('input-role').value.trim();
+            const phone = document.getElementById('input-phone').value.trim();
+            const email = document.getElementById('input-email').value.trim();
+            const location = document.getElementById('input-location').value.trim();
+            const linkedin = document.getElementById('input-linkedin').value.trim();
+            const summary = document.getElementById('input-summary').value.trim();
+            const skillsRaw = document.getElementById('input-skills').value.trim();
+            const coursesRaw = document.getElementById('input-courses').value.trim();
+
+            document.getElementById('resume-name').textContent = name || 'NOME SOBRENOME';
+            document.getElementById('resume-role').textContent = role || 'CARGO OU ÁREA DE ATUAÇÃO';
+            document.getElementById('resume-phone').textContent = phone || '(00) 00000-0000';
+            document.getElementById('resume-email').textContent = email || 'email@exemplo.com.br';
+            document.getElementById('resume-location').textContent = location || 'Cidade / UF';
+
+            // Iniciais caso não tenha foto
+            if (name) {
+                const parts = name.split(' ').filter(Boolean);
+                const initials = parts.length > 1
+                    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+                    : parts[0].substring(0, 2).toUpperCase();
+                document.getElementById('resume-initials').textContent = initials;
+            } else {
+                document.getElementById('resume-initials').textContent = 'CV';
+            }
+
+            // LinkedIn
+            const linkedinRow = document.getElementById('resume-linkedin-row');
+            if (linkedin) {
+                linkedinRow.classList.remove('hidden');
+                document.getElementById('resume-linkedin').textContent = linkedin;
+            } else if (name) {
+                linkedinRow.classList.add('hidden');
+            } else {
+                linkedinRow.classList.remove('hidden');
+                document.getElementById('resume-linkedin').textContent = 'linkedin.com/in/exemplo';
+            }
+
+            // Resumo
+            if (summary) {
+                document.getElementById('resume-summary').textContent = summary;
+            }
+
+            // Habilidades
+            const bulletColor = themes[state.theme].bulletColor;
+            if (skillsRaw) {
+                const skillsArray = skillsRaw.split(',').map(s => s.trim()).filter(Boolean);
+                const skillsHtml = skillsArray.map(skill =>
+                    `<li class="flex items-start gap-2"><span style="color:${bulletColor}" class="mt-0.5">•</span><span>${escapeHtml(skill)}</span></li>`
+                ).join('');
+                document.getElementById('resume-skills').innerHTML = skillsHtml;
+            }
+
+            // Experiências
+            const hasExp = state.experiences.some(e => e.company || e.role || e.description);
+            if (hasExp) {
+                const expHtml = state.experiences.filter(e => e.company || e.role || e.description).map(exp => {
+                    const bullets = exp.description
+                        ? exp.description.split('\n').map(line => line.replace(/^[-•*]\s*/, '').trim()).filter(Boolean)
+                        : ['Atuação dedicada nas rotinas da função com foco em qualidade e resultados.'];
+                    return `
+                        <div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <h3 class="font-bold text-[13px] text-slate-900 uppercase">${escapeHtml(exp.company || 'Empresa')} ${exp.role ? `| ${escapeHtml(exp.role)}` : ''}</h3>
+                                <span class="text-[11px] font-semibold text-slate-500 shrink-0">${escapeHtml(exp.period || '')}</span>
+                            </div>
+                            <ul class="mt-1.5 space-y-1 text-[12px] text-slate-700 leading-relaxed list-disc pl-4">
+                                ${bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('resume-experiences').innerHTML = expHtml;
+            }
+
+            // Formação Acadêmica
+            const hasEdu = state.education.some(e => e.course || e.institution);
+            if (hasEdu) {
+                const eduHtml = state.education.filter(e => e.course || e.institution).map(edu => `
+                    <div>
+                        <h3 class="font-bold text-[13px] text-slate-900 uppercase">${escapeHtml(edu.course || 'Curso')}</h3>
+                        <p class="text-[12px] text-slate-600">${escapeHtml(edu.institution || '')}</p>
+                        ${edu.year ? `<p class="text-[11.5px] text-slate-500">Conclusão: ${escapeHtml(edu.year)}</p>` : ''}
+                    </div>
+                `).join('');
+                document.getElementById('resume-education').innerHTML = eduHtml;
+            }
+
+            // Cursos
+            if (coursesRaw) {
+                const coursesLines = coursesRaw.split('\n').map(c => c.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+                document.getElementById('resume-courses').innerHTML = coursesLines.map(c => `<p>• ${escapeHtml(c)}</p>`).join('');
+            }
+        }
+
+        // INTEGRAÇÃO COM GEMINI API PARA REESCREVER E PROFISSIONALIZAR O CURRÍCULO
+        async function generateWithGemini() {
+            const name = document.getElementById('input-name').value.trim();
+            const role = document.getElementById('input-role').value.trim();
+
+            if (!name || !role) {
+                showToast('Preencha pelo menos seu Nome e o Cargo desejado!', 'error');
+                document.getElementById('input-name').focus();
+                return;
+            }
+
+            const btn = document.getElementById('ai-generate-btn');
+            const loadingOverlay = document.getElementById('ai-loading-overlay');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xl"></i> <span>A IA está criando seu currículo...</span>`;
+            loadingOverlay.classList.remove('hidden');
+
+            // No mobile, já muda para a aba de visualização para mostrar o progresso
+            if (window.innerWidth < 1024) {
+                switchMobileTab('preview');
+            }
+
+            const rawData = {
+                nome: name,
+                cargoDesejado: role,
+                resumoUsuario: document.getElementById('input-summary').value.trim(),
+                experiencias: state.experiences.filter(e => e.company || e.role || e.description),
+                formacao: state.education.filter(e => e.course || e.institution),
+                habilidades: document.getElementById('input-skills').value.trim(),
+                cursos: document.getElementById('input-courses').value.trim()
+            };
+
+            const systemPrompt = `Você é um especialista sênior em Recursos Humanos e Recrutamento no Brasil.
+Sua tarefa é transformar os dados brutos de um candidato em um currículo altamente profissional, persuasivo, sem erros de português, direto e otimizado para passar na triagem de recrutadores.
+Regras:
+1. Corrija toda a ortografia, concordância e pontuação.
+2. Crie um "resumoProfissional" convincente em primeira pessoa implícita (3 a 4 linhas) focado no cargo desejado.
+3. Para cada experiência enviada, reescreva o cargo de forma profissional e transforme o que a pessoa fazia em 2 a 3 bullet points fortes, usando verbos de ação e foco em resultados. Se o usuário não enviou nenhuma experiência, retorne um array vazio [].
+4. Gere ou aprimore uma lista de 5 a 6 "habilidades" estratégicas e valorizadas para o cargo desejado (mesclando o que o usuário informou com competências-chave da vaga).
+5. Formate os "cursos" de forma limpa e profissional (se houver).`;
+
+            const userQuery = `Dados do candidato:\n${JSON.stringify(rawData, null, 2)}`;
+
+            const apiKey = ""; // Fornecido automaticamente pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            cargoFormatado: { type: "STRING" },
+                            resumoProfissional: { type: "STRING" },
+                            experienciasMelhoradas: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        empresa: { type: "STRING" },
+                                        cargo: { type: "STRING" },
+                                        periodo: { type: "STRING" },
+                                        topicos: {
+                                            type: "ARRAY",
+                                            items: { type: "STRING" }
+                                        }
+                                    }
+                                }
+                            },
+                            habilidades: {
+                                type: "ARRAY",
+                                items: { type: "STRING" }
+                            },
+                            cursosFormatados: {
+                                type: "ARRAY",
+                                items: { type: "STRING" }
+                            }
+                        }
+                    }
+                }
+            };
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!jsonText) {
+                    throw new Error('Resposta vazia da IA');
+                }
+
+                const aiData = JSON.parse(jsonText);
+
+                // Atualiza os campos e a visualização com o texto profissionalizado pela IA
+                if (aiData.cargoFormatado) {
+                    document.getElementById('input-role').value = aiData.cargoFormatado;
+                    document.getElementById('resume-role').textContent = aiData.cargoFormatado;
+                }
+
+                if (aiData.resumoProfissional) {
+                    document.getElementById('input-summary').value = aiData.resumoProfissional;
+                    document.getElementById('resume-summary').textContent = aiData.resumoProfissional;
+                }
+
+                if (aiData.habilidades && aiData.habilidades.length > 0) {
+                    document.getElementById('input-skills').value = aiData.habilidades.join(', ');
+                    const bulletColor = themes[state.theme].bulletColor;
+                    document.getElementById('resume-skills').innerHTML = aiData.habilidades.map(skill =>
+                        `<li class="flex items-start gap-2"><span style="color:${bulletColor}" class="mt-0.5">•</span><span>${escapeHtml(skill)}</span></li>`
+                    ).join('');
+                }
+
+                if (aiData.experienciasMelhoradas && aiData.experienciasMelhoradas.length > 0) {
+                    // Sincroniza de volta no estado
+                    state.experiences = aiData.experienciasMelhoradas.map((exp, idx) => ({
+                        id: Date.now() + idx,
+                        company: exp.empresa,
+                        role: exp.cargo,
+                        period: exp.periodo,
+                        description: exp.topicos.join('\n')
+                    }));
+                    renderExperienceInputs();
+
+                    document.getElementById('resume-experiences').innerHTML = aiData.experienciasMelhoradas.map(exp => `
+                        <div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <h3 class="font-bold text-[13px] text-slate-900 uppercase">${escapeHtml(exp.empresa)} ${exp.cargo ? `| ${escapeHtml(exp.cargo)}` : ''}</h3>
+                                <span class="text-[11px] font-semibold text-slate-500 shrink-0">${escapeHtml(exp.periodo || '')}</span>
+                            </div>
+                            <ul class="mt-1.5 space-y-1 text-[12px] text-slate-700 leading-relaxed list-disc pl-4">
+                                ${exp.topicos.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `).join('');
+                } else {
+                    // Caso seja primeiro emprego (sem experiência)
+                    document.getElementById('resume-experiences').innerHTML = `
+                        <div>
+                            <h3 class="font-bold text-[13px] text-slate-900 uppercase">EM BUSCA DA PRIMEIRA OPORTUNIDADE PROFISSIONAL</h3>
+                            <ul class="mt-1.5 space-y-1 text-[12px] text-slate-700 leading-relaxed list-disc pl-4">
+                                <li>Alta disponibilidade para aprendizado rápido, dedicação integral e cumprimento de metas da equipe.</li>
+                                <li>Comprometimento com horários, boa comunicação e postura profissional no ambiente de trabalho.</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                if (aiData.cursosFormatados && aiData.cursosFormatados.length > 0) {
+                    document.getElementById('input-courses').value = aiData.cursosFormatados.join('\n');
+                    document.getElementById('resume-courses').innerHTML = aiData.cursosFormatados.map(c => `<p>• ${escapeHtml(c)}</p>`).join('');
+                }
+
+                syncPreview();
+                showToast('✨ Currículo profissionalizado com sucesso pela IA!');
+
+            } catch (error) {
+                console.error(error);
+                syncPreview();
+                showToast('Não foi possível conectar à IA agora, mas seus dados foram aplicados!', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-amber-300 text-xl"></i> <span>Gerar Currículo Profissional com IA</span>`;
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        // Fetch com Exponential Backoff
+        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (res.ok) return res;
+                    if (res.status === 429 || res.status >= 500) {
+                        await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+                        continue;
+                    }
+                    throw new Error(`HTTP error: ${res.status}`);
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+                }
+            }
+        }
+
+        // Exportar Folha A4 diretamente para PDF de alta qualidade
+        function downloadPDF() {
+            const element = document.getElementById('resume-document');
+            const scaleBox = document.getElementById('a4-scale-box');
+            const name = document.getElementById('input-name').value.trim() || 'Curriculo_Profissional';
+            const cleanFileName = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '_') + '_Curriculo.pdf';
+
+            showToast('Gerando seu arquivo PDF A4...', 'loading');
+
+            // Remove temporariamente qualquer escala mobile para exportar no tamanho A4 exato (210mm x 297mm)
+            const previousTransform = scaleBox.style.transform;
+            scaleBox.style.transform = 'none';
+
+            const opt = {
+                margin: 0,
+                filename: cleanFileName,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                scaleBox.style.transform = previousTransform;
+                showToast('📄 PDF baixado com sucesso! Pronto para enviar.');
+            }).catch(() => {
+                scaleBox.style.transform = previousTransform;
+                window.print();
+            });
+        }
+
+        // Preencher dados de exemplo para demonstração rápida
+        function fillExampleData() {
+            document.getElementById('input-name').value = 'Lucas Henrique Almeida';
+            document.getElementById('input-role').value = 'Auxiliar Administrativo e Atendimento';
+            document.getElementById('input-phone').value = '(11) 98765-4321';
+            document.getElementById('input-location').value = 'São Paulo / SP';
+            document.getElementById('input-email').value = 'lucas.almeida@email.com';
+            document.getElementById('input-linkedin').value = 'linkedin.com/in/lucasalmeida';
+            document.getElementById('input-summary').value = 'sou dedicado, gosto de trabalhar em equipe, sei mexer bem no computador e excel, sempre chego no horario e quero ajudar a empresa a vender mais e organizar os documentos.';
+
+            state.experiences = [
+                {
+                    id: 101,
+                    company: 'Mercado Central Ltda',
+                    role: 'Atendente e Repositor',
+                    period: 'Jan/2024 - Fev/2026',
+                    description: 'atendia os clientes no balcao e whatsapp, organizava o estoque e ajudava no fechamento do caixa todo dia'
+                },
+                {
+                    id: 102,
+                    company: 'Escritório Contábil Silva',
+                    role: 'Jovem Aprendiz Administrativo',
+                    period: 'Mar/2022 - Dez/2023',
+                    description: 'separava notas fiscais, fazia planilhas no excel e atendia telefone'
+                }
+            ];
+
+            state.education = [
+                {
+                    id: 201,
+                    course: 'Ensino Médio Completo',
+                    institution: 'Escola Estadual Prof. João Silva',
+                    year: '2022'
+                }
+            ];
+
+            document.getElementById('input-skills').value = 'Excel e Pacote Office, Atendimento ao Cliente, Organização, Comunicação, Pontualidade';
+            document.getElementById('input-courses').value = 'Informática Básica e Avançada - SENAI (2023)\nAtendimento ao Público e Vendas - SEBRAE (2024)';
+
+            renderExperienceInputs();
+            renderEducationInputs();
+            syncPreview();
+            showToast('Exemplo preenchido! Clique em "Gerar com IA" para ver a mágica.');
+        }
+
+        // Utilitário de segurança HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
