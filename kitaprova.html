@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kit Aprovação Rápida - Mensagens Prontas & Guia do RH</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter e Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#07162c',
+                            accent: '#0066FF',
+                            cyan: '#00D4FF',
+                            gold: '#FFC700',
+                            green: '#00C853'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .bg-mesh {
+            background-color: #07162c;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.22) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 212, 255, 0.14) 0px, transparent 50%);
+        }
+        /* Esconde barra de rolagem horizontal nos filtros mantendo o scroll funcional */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .highlight-var {
+            color: #38bdf8;
+            font-weight: 600;
+            background: rgba(56, 189, 248, 0.12);
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none w-[90%] max-w-sm">
+        <div class="bg-emerald-600 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center justify-center gap-3 border border-emerald-400/40 font-semibold text-sm">
+            <i class="fa-solid fa-circle-check text-lg"></i>
+            <span id="toast-text">Copiado com sucesso!</span>
+        </div>
+    </div>
+
+    <!-- Cabeçalho App -->
+    <header class="bg-mesh border-b border-slate-800/90 sticky top-0 z-40 backdrop-blur-xl">
+        <div class="max-w-4xl mx-auto px-4 pt-4 pb-3">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-rocket text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-heading font-extrabold text-lg sm:text-xl text-white leading-none">
+                                Kit Aprovação <span class="text-brand-cyan">Rápida</span>
+                            </h1>
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-brand-gold border border-amber-500/30 px-2 py-0.5 rounded-full">VIP</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Área Exclusiva • Scripts & Guia de Entrevista</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegação Principal Estilo App (2 Abas) -->
+            <div class="grid grid-cols-2 gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+                <button id="main-tab-messages" onclick="switchMainTab('messages')" class="py-3 px-3 rounded-xl font-heading font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md">
+                    <i class="fa-brands fa-whatsapp text-base sm:text-lg text-emerald-300"></i>
+                    <span>10 Mensagens Prontas</span>
+                </button>
+                <button id="main-tab-interview" onclick="switchMainTab('interview')" class="py-3 px-3 rounded-xl font-heading font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-user-tie text-base sm:text-lg text-brand-gold"></i>
+                    <span>15 Perguntas do RH</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+
+        <!-- ========================================================= -->
+        <!-- ABA 1: 10 MENSAGENS PRONTAS (WHATSAPP & E-MAIL)           -->
+        <!-- ========================================================= -->
+        <section id="section-messages" class="space-y-6">
+
+            <!-- Painel de Personalização Automática -->
+            <div class="bg-slate-900/90 border border-blue-500/30 rounded-2xl p-4 sm:p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-heading font-bold text-sm sm:text-base text-white flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-brand-cyan"></i>
+                        Preenchimento Automático nos 10 Modelos
+                    </h2>
+                    <button onclick="clearPersonalization()" class="text-xs text-slate-400 hover:text-white underline">Limpar</button>
+                </div>
+                <p class="text-xs text-slate-400 mb-3">Digite seus dados abaixo e todas as mensagens serão atualizadas na hora para você só copiar e enviar:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Seu Nome</label>
+                        <input type="text" id="var-name" oninput="renderMessages()" placeholder="Ex: João Silva" class="w-full bg-slate-950 border border-slate-700 focus:border-brand-cyan rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Nome da Vaga</label>
+                        <input type="text" id="var-role" oninput="renderMessages()" placeholder="Ex: Auxiliar Administrativo" class="w-full bg-slate-950 border border-slate-700 focus:border-brand-cyan rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Nome da Empresa</label>
+                        <input type="text" id="var-company" oninput="renderMessages()" placeholder="Ex: Mercado Central" class="w-full bg-slate-950 border border-slate-700 focus:border-brand-cyan rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros de Categoria (Scroll Horizontal no Mobile) -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="msg-filters">
+                <button onclick="setMsgFilter('all')" data-filter="all" class="msg-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-bold bg-brand-cyan text-slate-950 shadow-md transition">
+                    Todos (10)
+                </button>
+                <button onclick="setMsgFilter('wpp-exp')" data-filter="wpp-exp" class="msg-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                    WhatsApp (Com Experiência)
+                </button>
+                <button onclick="setMsgFilter('wpp-first')" data-filter="wpp-first" class="msg-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                    WhatsApp (Primeiro Emprego)
+                </button>
+                <button onclick="setMsgFilter('email')" data-filter="email" class="msg-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                    E-mail Profissional
+                </button>
+                <button onclick="setMsgFilter('followup')" data-filter="followup" class="msg-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                    Follow-up & Pós-Entrevista
+                </button>
+            </div>
+
+            <!-- Lista de Cartões de Mensagens -->
+            <div id="messages-container" class="space-y-4">
+                <!-- Renderizado via JS -->
+            </div>
+
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- ABA 2: AS 15 PERGUNTAS QUE TODO RH FAZ                    -->
+        <!-- ========================================================= -->
+        <section id="section-interview" class="hidden space-y-6">
+
+            <!-- Banner Introdutório + Busca -->
+            <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-brand-gold flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-lightbulb text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-heading font-bold text-base sm:text-lg text-white">Guia Prático de Entrevista</h2>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+                            Toque em qualquer pergunta abaixo para descobrir o que o recrutador está avaliando, o erro fatal que elimina candidatos e um roteiro pronto para você adaptar.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Barra de Busca -->
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input type="text" id="interview-search" oninput="renderQuestions()" placeholder="Buscar pergunta (ex: defeito, salário, experiência, 5 anos)..." class="w-full bg-slate-950 border border-slate-700 focus:border-brand-gold rounded-xl pl-10 pr-4 py-2.5 text-sm text-white outline-none transition">
+                </div>
+
+                <!-- Filtros por Nível/Tipo -->
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1" id="q-filters">
+                    <button onclick="setQFilter('all')" data-qfilter="all" class="q-filter-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-gold text-slate-950 transition">
+                        Todas (15)
+                    </button>
+                    <button onclick="setQFilter('classicas')" data-qfilter="classicas" class="q-filter-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                        Clássicas
+                    </button>
+                    <button onclick="setQFilter('pegadinhas')" data-qfilter="pegadinhas" class="q-filter-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                        Pegadinhas do RH
+                    </button>
+                    <button onclick="setQFilter('comportamentais')" data-qfilter="comportamentais" class="q-filter-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                        Comportamentais
+                    </button>
+                    <button onclick="setQFilter('sem-exp')" data-qfilter="sem-exp" class="q-filter-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-800 hover:border-slate-600 transition">
+                        Sem Experiência
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista Acordeão das 15 Perguntas -->
+            <div id="questions-container" class="space-y-3">
+                <!-- Renderizado via JS -->
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Rodapé Discreto -->
+    <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-500 mt-10">
+        <p>© 2026 Kit Aprovação Rápida • Material Exclusivo para Clientes</p>
+    </footer>
+
+    <script>
+        // =========================================================
+        // DADOS DOS 10 MODELOS DE MENSAGENS
+        // =========================================================
+        const messagesData = [
+            {
+                id: 1,
+                category: 'wpp-exp',
+                tag: 'WhatsApp • Com Experiência',
+                tagColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                type: 'whatsapp',
+                title: '1. Candidatura para Vaga Anunciada (Com Experiência)',
+                subject: '',
+                body: `Olá, tudo bem? Me chamo {NOME} e vi a divulgação da vaga de {VAGA} na {EMPRESA}.\n\nTenho experiência prática na área, facilidade com rotinas do dia a dia e disponibilidade para iniciar de imediato. Estou enviando meu currículo atualizado em anexo para avaliação.\n\nFico à disposição para conversarmos em uma entrevista. Muito obrigado(a)!`
+            },
+            {
+                id: 2,
+                category: 'wpp-first',
+                tag: 'WhatsApp • Primeiro Emprego',
+                tagColor: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+                type: 'whatsapp',
+                title: '2. Primeiro Emprego / Sem Experiência Formal (Foco em Vontade)',
+                subject: '',
+                body: `Olá, tudo bem? Meu nome é {NOME} e tenho muito interesse na oportunidade de {VAGA} na {EMPRESA}.\n\nEstou em busca da minha oportunidade profissional, sou uma pessoa muito dedicada, aprendo rápido, tenho facilidade com tecnologia e total comprometimento com horários.\n\nSegue meu currículo em anexo. Agradeço desde já pela atenção e oportunidade!`
+            },
+            {
+                id: 3,
+                category: 'wpp-first',
+                tag: 'WhatsApp • Banco de Talentos',
+                tagColor: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+                type: 'whatsapp',
+                title: '3. Entrega Espontânea (Lojas, Comércio e Empresas Locais)',
+                subject: '',
+                body: `Olá, bom dia! Tudo bem? Me chamo {NOME}.\n\nAdmiro muito o trabalho da {EMPRESA} e gostaria de deixar meu currículo atualizado caso surja alguma oportunidade para {VAGA} ou atendimento.\n\nTenho disponibilidade de horário e muita disposição para somar na equipe. Segue o arquivo em PDF. Muito obrigado(a)!`
+            },
+            {
+                id: 4,
+                category: 'wpp-exp',
+                tag: 'WhatsApp • Indicação',
+                tagColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                type: 'whatsapp',
+                title: '4. Candidatura com Indicação de Conhecido',
+                subject: '',
+                body: `Olá, tudo bem? Me chamo {NOME}. Recebi a recomendação de entrar em contato com vocês sobre a vaga de {VAGA} na {EMPRESA}.\n\nAcredito que meu perfil e minha dedicação combinam muito com o que a equipe precisa no momento. Estou enviando meu currículo em anexo para vocês conhecerem melhor minha trajetória.\n\nFico no aguardo e à disposição para uma conversa!`
+            },
+            {
+                id: 5,
+                category: 'wpp-exp',
+                tag: 'WhatsApp • Vaga Urgente',
+                tagColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                type: 'whatsapp',
+                title: '5. Vaga Urgente / Disponibilidade Imediata',
+                subject: '',
+                body: `Olá, tudo bem? Sou {NOME} e acabei de ver que vocês estão contratando para {VAGA} na {EMPRESA}.\n\nTenho disponibilidade imediata para começar, inclusive para testes ou entrevista ainda esta semana, e muita vontade de entregar resultados rápidos.\n\nSegue meu currículo em PDF logo abaixo. Obrigado(a) pela atenção!`
+            },
+            {
+                id: 6,
+                category: 'email',
+                tag: 'E-mail • Com Experiência',
+                tagColor: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+                type: 'email',
+                title: '6. E-mail Formal de Candidatura (Com Experiência)',
+                subject: 'Candidatura para vaga de {VAGA} - {NOME}',
+                body: `Prezados(as), boa tarde.\n\nGostaria de me candidatar à vaga de {VAGA} divulgada pela {EMPRESA}.\n\nPossuo experiência na área, foco em organização, agilidade e bom relacionamento em equipe, características que acredito serem essenciais para contribuir com os resultados da empresa.\n\nSegue meu currículo atualizado em anexo para análise. Coloco-me à inteira disposição para agendar uma entrevista.\n\nAtenciosamente,\n{NOME}`
+            },
+            {
+                id: 7,
+                category: 'email',
+                tag: 'E-mail • Primeiro Emprego / Estágio',
+                tagColor: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+                type: 'email',
+                title: '7. E-mail para Primeiro Emprego, Jovem Aprendiz ou Estágio',
+                subject: 'Candidatura: {VAGA} | {NOME}',
+                body: `Olá, equipe de Recrutamento da {EMPRESA}.\n\nMeu nome é {NOME} e envio meu currículo em anexo para concorrer à oportunidade de {VAGA}.\n\nEmbora esteja iniciando minha trajetória profissional, destaco minha facilidade de aprendizado, responsabilidade, boa comunicação e total dedicação para crescer junto com a empresa.\n\nAgradeço pela oportunidade de avaliação e fico à disposição para entrevista.\n\nCordialmente,\n{NOME}`
+            },
+            {
+                id: 8,
+                category: 'email',
+                tag: 'E-mail • Prospecção Ativa',
+                tagColor: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+                type: 'email',
+                title: '8. E-mail Espontâneo para Banco de Talentos do RH',
+                subject: 'Currículo para futuras oportunidades ({VAGA}) - {NOME}',
+                body: `Prezados(as), tudo bem?\n\nAcompanho o crescimento da {EMPRESA} e gostaria de disponibilizar meu currículo para o banco de talentos de vocês, especialmente para futuras vagas na área de {VAGA}.\n\nTenho perfil proativo, facilidade de adaptação e disponibilidade de início imediato.\n\nMuito obrigado(a) pelo tempo e atenção!\n\nAtenciosamente,\n{NOME}`
+            },
+            {
+                id: 9,
+                category: 'followup',
+                tag: 'WhatsApp • Follow-up (3 dias depois)',
+                tagColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+                type: 'whatsapp',
+                title: '9. Cobrar Retorno Educadamente (Sem Parecer Chato)',
+                subject: '',
+                body: `Olá, tudo bem? Aqui é {NOME}.\n\nEnviei meu currículo há alguns dias para a vaga de {VAGA} na {EMPRESA} e gostaria apenas de confirmar se vocês receberam o arquivo certinho.\n\nSigo muito interessado(a) na oportunidade e à disposição caso precisem de qualquer informação adicional. Obrigado(a)!`
+            },
+            {
+                id: 10,
+                category: 'followup',
+                tag: 'WhatsApp • Pós-Entrevista',
+                tagColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+                type: 'whatsapp',
+                title: '10. Agradecimento Estratégico Pós-Entrevista (Diferencial)',
+                subject: '',
+                body: `Olá, tudo bem? Aqui é {NOME}. Passando apenas para agradecer pela conversa e pela atenção na entrevista de hoje para a vaga de {VAGA}.\n\nGostei muito de conhecer melhor a {EMPRESA} e saí ainda mais motivado(a) com a possibilidade de fazer parte da equipe.\n\nFico na torcida e à disposição para os próximos passos!`
+            }
+        ];
+
+        // =========================================================
+        // DADOS DAS 15 PERGUNTAS DO RH
+        // =========================================================
+        const questionsData = [
+            {
+                id: 1,
+                category: 'classicas',
+                badge: 'Clássica • Abertura',
+                question: '1. Fale um pouco sobre você.',
+                why: 'O recrutador não quer a história da sua vida desde a infância. Ele quer avaliar sua capacidade de síntese, autoconfiança e se o seu perfil profissional combina com a vaga.',
+                dont: 'Falar da vida pessoal sem filtro ("tenho 3 cachorros, moro com minha tia, gosto de dormir") ou ler o currículo palavra por palavra.',
+                script: '"Meu nome é [Seu Nome], tenho [Idade] anos e sou uma pessoa muito focada em resultados e aprendizado rápido. Nos últimos tempos, venho me dedicando à área de [Sua Área], onde desenvolvi facilidade com atendimento ao público, organização e trabalho em equipe. Hoje busco uma oportunidade na [Empresa] para somar com minha energia e crescer profissionalmente."'
+            },
+            {
+                id: 2,
+                category: 'classicas',
+                badge: 'Clássica • Interesse',
+                question: '2. Por que você quer trabalhar nesta empresa?',
+                why: 'Saber se você pesquisou minimamente sobre o negócio ou se está atirando para todo lado sem critério.',
+                dont: '"Porque estou precisando pagar minhas contas" ou "Porque fica perto da minha casa" (mesmo que seja verdade, não diga só isso).',
+                script: '"Eu acompanho a [Nome da Empresa] e sei que vocês são referência no que fazem aqui na região. Além disso, vi que a vaga exige organização e comprometimento, que são exatamente os meus pontos fortes. Quero estar em um lugar sério onde eu possa evoluir junto com o time."'
+            },
+            {
+                id: 3,
+                category: 'classicas',
+                badge: 'Clássica • Autoconhecimento',
+                question: '3. Quais são seus pontos fortes?',
+                why: 'Confirmar se você possui as habilidades que a vaga realmente exige no dia a dia.',
+                dont: 'Citar qualidades genéricas sem dar um exemplo prático de como você usa isso.',
+                script: '"Meus três principais pontos fortes são: pontualidade, facilidade de aprender processos novos e boa comunicação. Por exemplo, sempre que entro em uma rotina nova, costumo anotar tudo para dominar o trabalho rápido e ajudar os colegas sem precisar ser cobrado."'
+            },
+            {
+                id: 4,
+                category: 'pegadinhas',
+                badge: 'Pegadinha • Muito Comum',
+                question: '4. Qual é o seu maior defeito?',
+                why: 'Testar sua sinceridade e maturidade. O RH quer ver se você reconhece um ponto de melhoria e o que está fazendo para corrigir.',
+                dont: 'Dizer "não tenho defeitos" (arrogância) ou usar clichês falsos como "sou perfeccionista demais", nem citar algo grave como "sou atrasado e brigo fácil".',
+                script: '"Eu costumava ter dificuldade em dizer \'não\' e acabava assumindo muitas tarefas ao mesmo tempo para ajudar todo mundo. Percebi que isso podia atrasar minhas entregas principais. Hoje eu uso uma lista de prioridades no começo do dia para resolver o que é mais urgente primeiro."'
+            },
+            {
+                id: 5,
+                category: 'pegadinhas',
+                badge: 'Pegadinha • Histórico',
+                question: '5. Por que você saiu (ou quer sair) do seu último emprego?',
+                why: 'Descobrir se você tem problemas de relacionamento, indisciplina ou se fala mal de antigos chefes.',
+                dont: 'Falar mal da empresa anterior, do chefe ou dos colegas. Isso faz o recrutador pensar que você fará o mesmo com ele no futuro.',
+                script: '"Sou muito grato pelo aprendizado que tive lá, pois aprendi muito sobre responsabilidade e rotina de trabalho. Porém, senti que meu ciclo naquela função já estava completo e agora busco um novo desafio onde eu tenha mais espaço para aprender e crescer."'
+            },
+            {
+                id: 6,
+                category: 'classicas',
+                badge: 'Clássica • Fechamento',
+                question: '6. Por que devemos contratar você e não outro candidato?',
+                why: 'Avaliar seu poder de persuasão e segurança sobre o valor que você entrega.',
+                dont: 'Dizer "porque eu preciso muito" ou desmerecer os outros candidatos.',
+                script: '"Porque vocês vão contratar alguém extremamente comprometido, que não tem medo de colocar a mão na massa e que veste a camisa desde o primeiro dia. Eu aprendo rápido, não dou trabalho com faltas ou atrasos e vou me dedicar ao máximo para dar retorno para a empresa."'
+            },
+            {
+                id: 7,
+                category: 'classicas',
+                badge: 'Clássica • Futuro',
+                question: '7. Onde você se vê daqui a 5 anos?',
+                why: 'Entender se você tem ambição saudável e se pretende permanecer na empresa por um bom tempo.',
+                dont: '"Não faço ideia", "Quero ter minha própria empresa" ou "Quero estar no seu lugar".',
+                script: '"Daqui a 5 anos, me vejo como um profissional muito mais experiente e especialista na minha área. Quero ter conquistado minha estabilidade, dominado todas as etapas do meu trabalho aqui dentro e, quem sabe, assumido maiores responsabilidades na empresa."'
+            },
+            {
+                id: 8,
+                category: 'comportamentais',
+                badge: 'Comportamental • Pressão',
+                question: '8. Como você lida com pressão e prazos curtos?',
+                why: 'Saber se você entra em pânico, trava ou desconta nos clientes quando o movimento aumenta.',
+                dont: '"Eu fico muito nervoso e estressado, mas faço".',
+                script: '"Eu procuro manter a calma e organizar o que precisa ser feito por ordem de importância. Quando o movimento aperta, eu foco 100% na solução em vez de reclamar do problema, e peço alinhamento rápido se precisar priorizar alguma entrega."'
+            },
+            {
+                id: 9,
+                category: 'sem-exp',
+                badge: 'Sem Experiência • Essencial',
+                question: '9. Você não tem experiência na área. Como vai dar conta?',
+                why: 'Testar sua confiança e verificar se você tem atitude compensatória (vontade, agilidade e facilidade para aprender).',
+                dont: 'Abaixar a cabeça e pedir desculpas por não ter experiência.',
+                script: '"Realmente ainda não tive o registro formal nessa função, mas justamente por isso não trago vícios de outros lugares. Tenho muita facilidade para aprender, presto atenção nos detalhes e estou com 100% de disposição para absorver o treinamento de vocês rápido."'
+            },
+            {
+                id: 10,
+                category: 'comportamentais',
+                badge: 'Comportamental • Conflitos',
+                question: '10. Conte sobre um problema ou conflito no trabalho e como resolveu.',
+                why: 'Avaliar sua inteligência emocional e postura profissional diante de desentendimentos.',
+                dont: 'Contar uma história onde você saiu como o "herói brigão" que humilhou o colega.',
+                script: '"Uma vez houve uma falha de comunicação sobre quem faria uma entrega e quase atrasamos o prazo. Em vez de procurar culpados, chamei o colega para conversar com calma, dividimos as tarefas na hora e conseguimos entregar tudo no horário combinado."'
+            },
+            {
+                id: 11,
+                category: 'pegadinhas',
+                badge: 'Pegadinha • Dinheiro',
+                question: '11. Qual é a sua pretensão salarial?',
+                why: 'Ver se você está dentro do orçamento da vaga e se conhece o valor do mercado.',
+                dont: '"Qualquer coisa serve" (desvaloriza você) ou pedir um valor totalmente fora da realidade do cargo.',
+                script: '"Pesquisei a média do mercado para essa função e estou totalmente aberto à proposta da empresa, dentro da faixa que vocês já trabalham para esse cargo, considerando também os benefícios."'
+            },
+            {
+                id: 12,
+                category: 'sem-exp',
+                badge: 'Sem Experiência • Lacuna',
+                question: '12. O que você fez nesse período em que ficou sem trabalhar?',
+                why: 'Saber se você ficou parado esperando cair do céu ou se buscou evoluir.',
+                dont: '"Fiquei só em casa procurando emprego na internet".',
+                script: '"Durante esse período, além de me dedicar à busca por uma boa oportunidade, aproveitei para atualizar meu currículo, fazer cursos online gratuitos para aprimorar minhas habilidades e ajudar em tarefas e bicos pontuais para me manter ativo."'
+            },
+            {
+                id: 13,
+                category: 'comportamentais',
+                badge: 'Comportamental • Equipe',
+                question: '13. Você prefere trabalhar em equipe ou sozinho?',
+                why: 'Verificar se você é colaborativo ou se tem dificuldade de convivência.',
+                dont: '"Prefiro trabalhar sozinho porque as pessoas atrapalham".',
+                script: '"Me adapto muito bem aos dois cenários. Gosto de trabalhar em equipe porque a troca de ideias agiliza o serviço e melhora o clima, mas também tenho total disciplina para focar e entregar minhas metas individuais sem precisar de supervisão o tempo todo."'
+            },
+            {
+                id: 14,
+                category: 'sem-exp',
+                badge: 'Sem Experiência • Orgulho',
+                question: '14. Qual foi a sua maior conquista profissional ou pessoal?',
+                why: 'Identificar o que você valoriza e se você tem capacidade de concluir objetivos.',
+                dont: 'Dizer "nunca conquistei nada importante". (Se for primeiro emprego, use uma conquista pessoal, escolar ou familiar).',
+                script: '"Uma conquista da qual tenho muito orgulho foi ter concluído meus estudos/curso mesmo enfrentando uma rotina corrida, mantendo sempre a disciplina. Isso me provou que, quando eu coloco uma meta na cabeça, eu vou até o fim."'
+            },
+            {
+                id: 15,
+                category: 'classicas',
+                badge: 'Clássica • Chave de Ouro',
+                question: '15. Você tem alguma pergunta para nós?',
+                why: 'Essa é a última impressão da entrevista. Quem diz apenas "não" parece desinteressado.',
+                dont: 'Perguntar logo de cara "quanto é o salário?" ou "quando eu tiro férias?".',
+                script: '"Tenho sim! Na visão de vocês, o que um profissional precisa fazer nos primeiros 30 dias nessa vaga para vocês olharem e pensarem: \'Fizemos a contratação certa\'?"'
+            }
+        ];
+
+        let currentMsgFilter = 'all';
+        let currentQFilter = 'all';
+
+        // Inicialização
+        window.onload = function() {
+            renderMessages();
+            renderQuestions();
+        };
+
+        // Toast Feedback
+        function showToast(text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').textContent = text;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2800);
+        }
+
+        // Alternar Abas Principais
+        function switchMainTab(tab) {
+            const secMsg = document.getElementById('section-messages');
+            const secInt = document.getElementById('section-interview');
+            const btnMsg = document.getElementById('main-tab-messages');
+            const btnInt = document.getElementById('main-tab-interview');
+
+            if (tab === 'messages') {
+                secMsg.classList.remove('hidden');
+                secInt.classList.add('hidden');
+                btnMsg.className = 'py-3 px-3 rounded-xl font-heading font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md';
+                btnInt.className = 'py-3 px-3 rounded-xl font-heading font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+            } else {
+                secMsg.classList.add('hidden');
+                secInt.classList.remove('hidden');
+                btnInt.className = 'py-3 px-3 rounded-xl font-heading font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-md';
+                btnMsg.className = 'py-3 px-3 rounded-xl font-heading font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // =========================================================
+        // FUNÇÕES DA ABA 1: MENSAGENS PRONTAS
+        // =========================================================
+        function setMsgFilter(filter) {
+            currentMsgFilter = filter;
+            document.querySelectorAll('.msg-filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.className = 'msg-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-bold bg-brand-cyan text-slate-950 shadow-md transition';
+                } else {
+                    btn.className = 'msg-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-600 transition';
+                }
+            });
+            renderMessages();
+        }
+
+        function clearPersonalization() {
+            document.getElementById('var-name').value = '';
+            document.getElementById('var-role').value = '';
+            document.getElementById('var-company').value = '';
+            renderMessages();
+        }
+
+        function getPersonalizedText(rawText, isHtml = false) {
+            const nameVal = document.getElementById('var-name').value.trim();
+            const roleVal = document.getElementById('var-role').value.trim();
+            const companyVal = document.getElementById('var-company').value.trim();
+
+            const nameRep = nameVal || '[Seu Nome]';
+            const roleRep = roleVal || '[Nome da Vaga]';
+            const companyRep = companyVal || '[Nome da Empresa]';
+
+            if (!isHtml) {
+                return rawText
+                    .replace(/\{NOME\}/g, nameRep)
+                    .replace(/\{VAGA\}/g, roleRep)
+                    .replace(/\{EMPRESA\}/g, companyRep);
+            } else {
+                const escaped = escapeHtml(rawText);
+                return escaped
+                    .replace(/\{NOME\}/g, `<span class="highlight-var">${escapeHtml(nameRep)}</span>`)
+                    .replace(/\{VAGA\}/g, `<span class="highlight-var">${escapeHtml(roleRep)}</span>`)
+                    .replace(/\{EMPRESA\}/g, `<span class="highlight-var">${escapeHtml(companyRep)}</span>`)
+                    .replace(/\n/g, '<br>');
+            }
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messages-container');
+            const filtered = currentMsgFilter === 'all'
+                ? messagesData
+                : messagesData.filter(m => m.category === currentMsgFilter);
+
+            container.innerHTML = filtered.map(msg => {
+                const htmlBody = getPersonalizedText(msg.body, true);
+                const htmlSubject = msg.subject ? getPersonalizedText(msg.subject, true) : '';
+
+                return `
+                    <div class="bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-lg transition">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full border ${msg.tagColor}">
+                                ${msg.tag}
+                            </span>
+                            <span class="text-[11px] text-slate-500 font-medium">Modelo #${msg.id}</span>
+                        </div>
+
+                        <h3 class="font-heading font-bold text-base sm:text-lg text-white mb-3">
+                            ${msg.title}
+                        </h3>
+
+                        ${msg.subject ? `
+                            <div class="bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 mb-2.5 text-xs sm:text-sm">
+                                <span class="text-slate-400 font-semibold">Assunto do E-mail: </span>
+                                <span class="text-slate-100">${htmlSubject}</span>
+                            </div>
+                        ` : ''}
+
+                        <div class="bg-slate-950 border border-slate-800/90 rounded-xl p-4 text-sm text-slate-200 leading-relaxed mb-4">
+                            ${htmlBody}
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-2.5">
+                            <button onclick="copyMessage(${msg.id}, this)" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>Copiar Mensagem</span>
+                            </button>
+
+                            ${msg.type === 'whatsapp' ? `
+                                <button onclick="openWhatsApp(${msg.id})" class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md">
+                                    <i class="fa-brands fa-whatsapp text-base"></i>
+                                    <span>Abrir no WhatsApp</span>
+                                </button>
+                            ` : `
+                                <button onclick="copySubject(${msg.id})" class="sm:w-auto py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-2 border border-slate-700">
+                                    <i class="fa-solid fa-heading"></i>
+                                    <span>Copiar Assunto</span>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function copyMessage(id, btnElement) {
+            const msg = messagesData.find(m => m.id === id);
+            if (!msg) return;
+
+            const plainText = getPersonalizedText(msg.body, false);
+            copyToClipboard(plainText);
+
+            // Feedback visual direto no botão
+            const originalHtml = btnElement.innerHTML;
+            btnElement.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+            btnElement.classList.add('bg-emerald-600');
+            btnElement.innerHTML = `<i class="fa-solid fa-check"></i> <span>Copiado! ✓</span>`;
+
+            showToast('Mensagem copiada! Agora é só colar e enviar.');
+
+            setTimeout(() => {
+                btnElement.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                btnElement.classList.remove('bg-emerald-600');
+                btnElement.innerHTML = originalHtml;
+            }, 2200);
+        }
+
+        function copySubject(id) {
+            const msg = messagesData.find(m => m.id === id);
+            if (!msg || !msg.subject) return;
+            const plainSubject = getPersonalizedText(msg.subject, false);
+            copyToClipboard(plainSubject);
+            showToast('Assunto do e-mail copiado!');
+        }
+
+        function openWhatsApp(id) {
+            const msg = messagesData.find(m => m.id === id);
+            if (!msg) return;
+            const plainText = getPersonalizedText(msg.body, false);
+            const url = `https://wa.me/?text=${encodeURIComponent(plainText)}`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
+        // =========================================================
+        // FUNÇÕES DA ABA 2: 15 PERGUNTAS DO RH
+        // =========================================================
+        function setQFilter(filter) {
+            currentQFilter = filter;
+            document.querySelectorAll('.q-filter-btn').forEach(btn => {
+                if (btn.dataset.qfilter === filter) {
+                    btn.className = 'q-filter-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-gold text-slate-950 transition';
+                } else {
+                    btn.className = 'q-filter-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-800 hover:border-slate-600 transition';
+                }
+            });
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            const search = document.getElementById('interview-search').value.toLowerCase().trim();
+
+            const filtered = questionsData.filter(item => {
+                const matchesCat = currentQFilter === 'all' || item.category === currentQFilter;
+                const matchesSearch = !search ||
+                    item.question.toLowerCase().includes(search) ||
+                    item.script.toLowerCase().includes(search) ||
+                    item.why.toLowerCase().includes(search);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 text-sm">
+                        Nenhuma pergunta encontrada com esse termo. Tente buscar outra palavra!
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((item, idx) => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden transition">
+                    <button type="button" onclick="toggleAccordion(${item.id})" class="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-slate-800/40 transition">
+                        <div class="space-y-1.5">
+                            <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/15 text-brand-gold border border-amber-500/30">
+                                ${item.badge}
+                            </span>
+                            <h3 class="font-heading font-bold text-sm sm:text-base text-white">
+                                ${item.question}
+                            </h3>
+                        </div>
+                        <div id="chevron-${item.id}" class="w-8 h-8 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400 shrink-0 transition-transform duration-200 ${idx === 0 ? 'rotate-180 text-brand-gold' : ''}">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </button>
+
+                    <div id="content-${item.id}" class="${idx === 0 ? '' : 'hidden'} px-4 sm:px-5 pb-5 pt-1 border-t border-slate-800/80 space-y-4">
+                        
+                        <!-- O que o RH quer saber -->
+                        <div class="bg-blue-950/30 border border-blue-500/20 rounded-xl p-3.5">
+                            <p class="text-xs font-bold text-brand-cyan uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-brain"></i> O que o RH realmente quer saber:
+                            </p>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${item.why}</p>
+                        </div>
+
+                        <!-- O que NÃO dizer -->
+                        <div class="bg-red-950/25 border border-red-500/25 rounded-xl p-3.5">
+                            <p class="text-xs font-bold text-red-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Erro Fatal (O que NÃO dizer):
+                            </p>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${item.dont}</p>
+                        </div>
+
+                        <!-- Modelo de Resposta Pronta -->
+                        <div class="bg-emerald-950/25 border border-emerald-500/30 rounded-xl p-4">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-comment-dots"></i> Modelo de Resposta Pronta:
+                                </p>
+                                <button onclick="copyAnswer(${item.id}, this)" class="text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                                    <i class="fa-regular fa-copy"></i> Copiar Resposta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-100 italic leading-relaxed">${item.script}</p>
+                        </div>
+
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(`content-${id}`);
+            const chevron = document.getElementById(`chevron-${id}`);
+            if (!content) return;
+
+            const isHidden = content.classList.contains('hidden');
+            if (isHidden) {
+                content.classList.remove('hidden');
+                chevron.classList.add('rotate-180', 'text-brand-gold');
+            } else {
+                content.classList.add('hidden');
+                chevron.classList.remove('rotate-180', 'text-brand-gold');
+            }
+        }
+
+        function copyAnswer(id, btn) {
+            const item = questionsData.find(q => q.id === id);
+            if (!item) return;
+
+            const cleanScript = item.script.replace(/^"|"$/g, '');
+            copyToClipboard(cleanScript);
+
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Copiado! ✓`;
+            showToast('Resposta copiada para treinar ou adaptar!');
+            setTimeout(() => {
+                btn.innerHTML = orig;
+            }, 2000);
+        }
+
+        // Utilitário seguro para copiar texto (funciona em iframes e celulares)
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Erro ao copiar', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
